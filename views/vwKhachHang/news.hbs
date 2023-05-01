@@ -1,0 +1,328 @@
+{{#section 'css'}}
+    <link rel="stylesheet" href="public/CSS/doitac.css">
+
+{{/section}}
+
+<head>
+
+<style>
+
+    .background1{
+        background-color: #FFF8F8;
+        padding-top: 100px;
+        height: 100vh;
+
+        /*padding-left: 100px;*/
+    }
+
+
+
+    #map {
+        font-weight: bold;
+        display: flex;
+
+        align-items: center;
+    }
+
+    #text {
+        margin-right: 10px;
+    }
+
+    .search-container {
+        display: flex;
+    }
+
+    .search-option {
+        flex: 1;
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+        padding: 6px 12px;
+        height: 38px;
+    }
+
+    .search-bar {
+        flex: 3;
+        display: flex;
+    }
+
+    #search-input {
+        flex: 3;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 6px 12px;
+        height: 38px;
+    }
+
+    #search-button {
+        flex: 1;
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        height: 38px;
+    }
+
+    .btn-search {
+        border: 1px solid #FFDAD7;
+        border-radius: 8px;
+        letter-spacing: 0.05rem;
+        padding: 0.6rem 1rem;
+        color: black;
+        background-color: #FFDAD7;
+
+        font-style: normal;
+        font-weight: 400;
+
+    }
+
+     .container {
+         padding-top: 100px;
+     }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+    }
+
+    /* Style cho phần tử label */
+    label {
+        display: inline-block;
+        width: 100px;
+        margin-right: 10px;
+    }
+
+    /* Style cho phần tử input */
+    input {
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+    }
+
+    /* Style cho phần tử textarea */
+    textarea {
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+    }
+
+    /* Style cho phần tử select */
+    select {
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+    }
+
+    /* Style cho phần tử button */
+    button {
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        background-color: #007bff;
+        color: #fff;
+        cursor: pointer;
+    }
+\0
+</style>
+
+</head>
+<body>
+    <section class="background1">
+        <div class="container ">
+
+
+
+
+            <label for="madtDropdown">Mã đối tác:</label>
+            <select id="madtDropdown">
+                <option value=""></option>
+                {{#each this.list}}
+                    <option value="{{MADT}}">{{MADT}}</option>
+                {{/each}}
+            </select>
+            <br>
+            <label for="matddaDropdown">Mã Thực đơn:</label>
+            <select id="matddaDropdown">
+                <option value=""></option>
+                {{#each this.list1}}
+                    <option value="{{MATD_DA}}">{{MATD_DA}}</option>
+                {{/each}}
+            </select>
+            <br>
+            <label for="mamaDropdown">Tên Món Ăn:</label>
+            <select id="mamaDropdown">
+                <option value=""></option>
+                {{#each this.list2}}
+                    <option value="{{MAMA}}">{{TENMA}}</option>
+                {{/each}}
+            </select>
+            <br>
+
+
+
+            <label for="tenMAInput">Tên món ăn:</label>
+            <input type="text" id="tenMAInput" readonly>
+            <br>
+            <label for="giaInput">Giá:</label >
+            <input type="number" id="giaInput" readonly>
+            <br>
+            <label for="mieutaInput">Miêu tả:</label>
+
+            <textarea id="mieutaInput" readonly ></textarea>
+            <br>
+            <label for="muahangDropdown">Hình thức thanh toán:</label>
+            <select id="muahangDropdown">
+                <option value="tienmat">Thanh toán trực tiếp </option>
+                <option value="Momo">Momo </option>
+                <option value="Zalopay">Zalopay </option>
+            </select>
+            <br>
+                <button id="updateButton">Mua</button>
+
+        </div>
+
+    </section>
+</body>
+<script>
+    const madtDropdown = document.getElementById('madtDropdown');
+    const matddaDropdown = document.getElementById('matddaDropdown');
+    const mamaDropdown = document.getElementById('mamaDropdown');
+    const giaInput = document.getElementById('giaInput');
+    const mieutaInput = document.getElementById('mieutaInput');
+    // const tenTDInput = document.getElementById('tenTDInput');
+    const tenMAInput = document.getElementById('tenMAInput');
+    // const tenDTInput = document.getElementById('tenDTInput');
+
+
+    // listen to the change event on the Mã đối tác dropdown
+    madtDropdown.addEventListener('change', async () => {
+        // get the selected Mã đối tác value
+        const selectedMadt = madtDropdown.value;
+
+        // make an AJAX request to the server to get the corresponding Mã Thực đơn data
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `/api/matdda?madt=${selectedMadt}`);
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                // parse the response data and update the Mã Thực đơn dropdown options
+                const matddaData = JSON.parse(xhr.responseText);
+                matddaDropdown.innerHTML = '';
+                matddaDropdown.appendChild(document.createElement('option'));
+                matddaData.forEach((item) => {
+                    const option = document.createElement('option');
+                    option.value = item.MATD_DA;
+                    option.textContent = item.MATD_DA;
+                    matddaDropdown.appendChild(option);
+                });
+                // tenDTInput.value = matddaData[0].TENQUAN;
+                // tenTDInput.value = matddaData[0].TENTDDA;
+
+
+            } else {
+                // handle errors
+                console.error('Error:', xhr.statusText);
+            }
+        };
+        xhr.onerror = () => {
+            console.error('Error:', xhr.statusText);
+        };
+        xhr.send();
+        // try {
+        //     const response = await fetch(`/api/matdda?madt=${selectedMadt}`);
+        //     const matddaData = await response.json();
+        //     // update the price and description input fields
+        //
+        //     tenTDInput.value = matddaData[0].TENTDDA;
+        // } catch (error) {
+        //     // handle errors
+        //     console.error('Error:', error);
+        // }
+    });
+    matddaDropdown.addEventListener('change', async () => {
+        // get the selected Mã đối tác value
+        const selectedMatdda = matddaDropdown.value;
+
+        // make an AJAX request to the server to get the corresponding Mã Thực đơn data
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `/api/mama?matdda=${selectedMatdda}`);
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                // parse the response data and update the Mã Thực đơn dropdown options
+                const mamaData = JSON.parse(xhr.responseText);
+                mamaDropdown.innerHTML = '';
+                mamaDropdown.appendChild(document.createElement('option'));
+                mamaData.forEach((item) => {
+                    const option = document.createElement('option');
+                    option.value = item.MAMA;
+                    option.textContent = item.TENMA;
+                    mamaDropdown.appendChild(option);
+                });
+                // tenTDInput.value = mamaData[0].TENTDDA;
+
+                // tenMAInput.value = mamaData[0].TENMA;
+
+            } else {
+                // handle errors
+                console.error('Error:', xhr.statusText);
+            }
+        };
+        xhr.onerror = () => {
+            console.error('Error:', xhr.statusText);
+        };
+        xhr.send();
+        // try {
+        //     const response = await fetch(`/api/mama?matdda=${selectedMatdda}`);
+        //     const mamaData = await response.json();
+        //     // update the price and description input fields
+        //     tenTDInput.value = mamaData[0].TENTDDA;
+        //
+        //     // tenMAInput.value = mamaData[0].TENMA;
+        // } catch (error) {
+        //     // handle errors
+        //     console.error('Error:', error);
+        // }
+    });
+    mamaDropdown.addEventListener('change', async () => {
+        // get the selected Mã món ăn value
+        const selectedMama = mamaDropdown.value;
+        const selectedMatdda = matddaDropdown.value;
+
+        // make an AJAX request to the server to get the corresponding Món ăn data
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `/api/monan?mama=${selectedMama}&matd=${selectedMatdda}`);
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                // parse the response data and update the price and description input fields
+                const monanData = JSON.parse(xhr.responseText);
+                giaInput.value = monanData[0].GIA;
+                mieutaInput.value = monanData[0].MIEUTA;
+                tenMAInput.value = monanData[0].TENMA;
+
+            } else {
+                // handle errors
+                console.error('Error:', xhr.statusText);
+            }
+        };
+        xhr.onerror = () => {
+            console.error('Error:', xhr.statusText);
+        };
+        xhr.send();
+
+        // // get the corresponding Món ăn data from the server using async/await
+        // try {
+        //     const response = await fetch(`/api/monan?mama=${selectedMama}`);
+        //     const monanData = await response.json();
+        //     // update the price and description input fields
+        //     giaInput.value = monanData[0].GIA;
+        //     mieutaInput.value = monanData[0].MIEUTA;
+        //     tenMAInput.value = monanData[0].TENMA;
+        // } catch (error) {
+        //     // handle errors
+        //     console.error('Error:', error);
+        // }
+    });
+
+
+</script>
